@@ -24,3 +24,4 @@ def peer_discovery(ip_address):
 
         # Wait for 8 seconds before sending the next message
         time.sleep(8)
+
