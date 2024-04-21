@@ -2,11 +2,10 @@ import json
 import time
 import socket
 
-def peer_discovery():
+def peer_discovery(ip_address):
     #This functions requires the username of the user as an input
  
     # Set the IP address and port of the receiver
-    ip_address = "localhost"
     port = 6000
 
     # Create a socket object
