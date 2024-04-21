@@ -1,8 +1,9 @@
 import json
 import time
 import socket
+import sys
 
-def peer_discovery(ip_address):
+def Service_Announcer(ip_address):
     #This functions requires the username of the user as an input
  
     # Set the IP address and port of the receiver
@@ -10,9 +11,11 @@ def peer_discovery(ip_address):
 
     # Create a socket object
     broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    
+    #if linux - levent
 
     #broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    
+
     username = input("Enter a username: ")
 
     while True:
@@ -27,3 +30,4 @@ def peer_discovery(ip_address):
         # Wait for 8 seconds before sending the next message
         time.sleep(8)
 
+def peer_discovery():
