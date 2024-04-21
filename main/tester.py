@@ -18,3 +18,4 @@ while True:
     json_data = json.loads(data.decode())
 
     print('Username:', json_data['username'])
+    print('Client IP Address:', client_address[0])

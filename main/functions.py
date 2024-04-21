@@ -1,4 +1,5 @@
 import json
+import os
 import time
 import socket
 import sys
@@ -12,9 +13,11 @@ def Service_Announcer(ip_address):
     # Create a socket object
     broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     
-    #if linux - levent
+    # Program does not run on linux unless the socket is set up for broadcasting
+    # Meanwhile, it does not run on Windows if the following line is included
 
-    #broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    if os.name == 'posix':
+        broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
     username = input("Enter a username: ")
 
@@ -30,5 +33,11 @@ def Service_Announcer(ip_address):
         # Wait for 8 seconds before sending the next message
         time.sleep(8)
 
-def peer_discovery():
+def Peer_Discovery():
+    pass
+
+def Chat_Initiator():
+    pass
+
+def Chat_Responder():
     pass
