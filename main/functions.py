@@ -10,8 +10,8 @@ def peer_discovery(ip_address):
 
     # Create a socket object
     broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    
-    username = input("Enter a string: ")
+    broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    username = input("Enter a username: ")
 
     while True:
         # Create the JSON message
