@@ -6,7 +6,7 @@ def peer_discovery():
     #This functions requires the username of the user as an input
  
     # Set the IP address and port of the receiver
-    ip_address = "192.168.30.255"
+    ip_address = "localhost"
     port = 6000
 
     # Create a socket object
@@ -21,6 +21,7 @@ def peer_discovery():
         # Send the message to the receiver
         broadcast_socket.sendto(message.encode(), (ip_address, port))
 
+        print("Username is broadcasted!")
+
         # Wait for 8 seconds before sending the next message
         time.sleep(8)
-        print("Username is broadcasted!")

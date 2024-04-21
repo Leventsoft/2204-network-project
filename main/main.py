@@ -13,5 +13,4 @@ my_thread = threading.Thread(target=peer_discovery)
 my_thread.start()
 
 
-
 # Continue with the rest of your code
