@@ -2,7 +2,6 @@ import json
 import os
 import time
 import socket
-import sys
 
 def Service_Announcer(ip_address):
     #This functions requires the username of the user as an input
@@ -14,7 +13,7 @@ def Service_Announcer(ip_address):
     broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     
     # Program does not run on linux unless the socket is set up for broadcasting
-    # Meanwhile, it does not run on Windows if the following line is included
+    # Meanwhile, it does not run on Windows if it is set up for broadcasting
 
     if os.name == 'posix':
         broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
