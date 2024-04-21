@@ -31,3 +31,4 @@ def Service_Announcer(ip_address):
         time.sleep(8)
 
 def peer_discovery():
+    pass
