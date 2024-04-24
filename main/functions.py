@@ -108,7 +108,8 @@ def Chat_Initiator():
             chat_username = locked_input("Enter a username to chat with: ")
 
             security = locked_input("Please specify [S]ecure or [U]nsecure chat:")
-            if security == "S" or "s":
+            
+            if security == "S" or security == "s":
                 print("Secure chat initiated!")
             
             else:
@@ -127,6 +128,7 @@ def Chat_Initiator():
                 tcp_socket.send(json_message.encode())
                 # Close the TCP connection
                 tcp_socket.close()
+               
 
         elif action == "History":
             # View chat history
