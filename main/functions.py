@@ -29,7 +29,7 @@ def Service_Announcer(ip_address):
         # Send the message to the receiver
         broadcast_socket.sendto(message.encode(), (ip_address, port))
 
-        print("Username is broadcasted!")
+        print(username,"is broadcasted!")
 
         # Wait for 8 seconds before sending the next message
         time.sleep(8)
@@ -57,7 +57,7 @@ def Peer_Discovery():
         username = json_data['username']
 
         # Store the IP address and username in the dictionary
-        ip_username_dict[client_address[0]] = username
+        ip_username_dict[client_address[0]] = {'username': username}
 
         # Update the timestamp for the sender's IP address
         ip_username_dict[client_address[0]]['timestamp'] = time.time()
