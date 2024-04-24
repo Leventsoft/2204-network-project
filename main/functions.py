@@ -66,8 +66,11 @@ def Peer_Discovery():
 
 def Chat_Initiator():
 
+    # Define the dictionary as global to access the IP addresses and usernames
     global ip_username_dict
-    
+
+    # TCP 6001
+
     pass
 
 def Chat_Responder():
