@@ -226,7 +226,7 @@ def Chat_Responder():
             
 
 
-            print('Decrypted message:', message)
+            print('Decrypted message:', message.decode("utf-8"))
 
 
         elif 'unencrypted_message' in json_data:
