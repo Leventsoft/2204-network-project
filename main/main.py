@@ -14,4 +14,7 @@ Discovery_Thread.start()
 Chat_Initiation_Thread.start()
 
 
-# Continue with the rest of your code
+# Wait for the threads to finish
+Announcer_Thread.join()
+Discovery_Thread.join()
+Chat_Initiation_Thread.join()
