@@ -105,6 +105,29 @@ def Chat_Initiator():
             # Initiate chat
             print("Chat initiated!")
 
+            chat_username = locked_input("Enter a username to chat with: ")
+
+            security = locked_input("Please specify [S]ecure or [U]nsecure chat:")
+            if security == "S" or "s":
+                print("Secure chat initiated!")
+            
+            else:
+                print("Unsecure chat initiated!")
+                message = locked_input("Enter your message: ")
+                # Create the JSON message with unencrypted message
+                json_message = json.dumps({"unencrypted_message": message})
+                # Send the message to the end user
+                # Get the IP address from the dictionary
+                ip_address = ip_username_dict[chat_username]['ip_address']
+                # Create a TCP socket object
+                tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                # Connect to the IP address and port 6001
+                tcp_socket.connect((ip_address, 6001))
+                # Send the JSON message over the TCP connection
+                tcp_socket.send(json_message.encode())
+                # Close the TCP connection
+                tcp_socket.close()
+
         elif action == "History":
             # View chat history
             print("Chat history:")
