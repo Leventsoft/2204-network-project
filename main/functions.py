@@ -85,8 +85,9 @@ def Chat_Initiator():
 
     while True:
 
-       
-        if input_function() == "Users":
+        action = input_function()
+        
+        if action == "Users":
             # View online users
             current_time = time.time()
             # Iterate over the IP addresses and usernames in the dictionary
