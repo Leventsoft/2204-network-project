@@ -69,16 +69,47 @@ def Peer_Discovery():
         print([ip_username_dict])
         #print('Client IP Address:', client_address[0])
 
-
+def check_user_status():
+    # Define the dictionary as global to access the IP addresses and usernames
+    global ip_username_dict
+    # Get the current time
+   
 
 def Chat_Initiator():
-
     # Define the dictionary as global to access the IP addresses and usernames
     global ip_username_dict
 
-    # TCP 6001
+    # Prompt the user to specify the action
+    action = input("Specify action (Users/Chat/History): ")
 
-    pass
+    if action == "Users":
+        # View online users
+        current_time = time.time()
+        # Iterate over the IP addresses and usernames in the dictionary
+        for ip, user_info in ip_username_dict.items():
+            # Check if the user's timestamp is within the last 15 minutes
+            if current_time - user_info['timestamp'] <= 900:
+                # Check if the user's timestamp is within the last 10 seconds
+                if current_time - user_info['timestamp'] <= 10:
+                    # Display the username as (Online)
+                    print(user_info['username'], "(Online)")
+                else:
+                    # Display the username as (Away)
+                    print(user_info['username'], "(Away)")
+
+    elif action == "Chat":
+        # Initiate chat
+        print("Chat initiated!")
+
+    elif action == "History":
+        # View chat history
+        print("Chat history:")
+        # Add your code to display chat history here
+
+    else:
+        print("Invalid action specified!")
+
+    # TCP 6001
 
 def Chat_Responder():
     pass
