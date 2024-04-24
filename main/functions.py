@@ -5,6 +5,12 @@ import socket
 import queue
 import threading
 
+INPUT_LOCK = threading.Lock()
+
+def locked_input(prompt):
+    with INPUT_LOCK:
+        return input(prompt)
+
 ip_username_dict = {}
 
 def Service_Announcer(ip_address):
@@ -22,7 +28,7 @@ def Service_Announcer(ip_address):
     if os.name == 'posix':
         broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-    username = input("Enter a username: ")
+    username = locked_input("Enter a username: ")
 
     while True:
         # Create the JSON message
@@ -76,11 +82,7 @@ def check_user_status():
     global ip_username_dict
     # Get the current time
  
-INPUT_LOCK = threading.Lock()
 
-def locked_input(prompt):
-    with INPUT_LOCK:
-        return input(prompt)
 
 def Chat_Initiator():
     # Define the dictionary as global to access the IP addresses and usernames
