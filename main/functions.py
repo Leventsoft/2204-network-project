@@ -2,7 +2,6 @@ import json
 import os
 import time
 import socket
-import queue
 import threading
 
 INPUT_LOCK = threading.Lock()
@@ -14,7 +13,7 @@ def locked_input(prompt):
 ip_username_dict = {}
 
 def Service_Announcer(ip_address):
-    #This functions requires the username of the user as an input
+    #This functions requires the broadcast address as an input
  
     # Set the IP address and port of the receiver
     port = 6000
@@ -77,20 +76,14 @@ def Peer_Discovery():
         #print([ip_username_dict])
         #print('Client IP Address:', client_address[0])
 
-def check_user_status():
-    # Define the dictionary as global to access the IP addresses and usernames
-    global ip_username_dict
-    # Get the current time
- 
+
 def Chat_Initiator():
     # Define the dictionary as global to access the IP addresses and usernames
     global ip_username_dict
 
-
-
     while True:
 
-        action = input("Enter an action (Users, Chat, History): ")
+        action = locked_input("Enter an action (Users, Chat, History): ")
 
 
         if action == "Users":
