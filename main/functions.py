@@ -139,6 +139,8 @@ def Chat_Initiator():
                 tcp_socket.send(json_message.encode())
                 # Close the TCP connection
 
+
+
                 encrypted_msg = input('Input lowercase sentence:')
 
                 encrypted_msg = pyDes.triple_des(key.ljust(24)).encrypt(encrypted_msg, padmode=2)
@@ -146,6 +148,7 @@ def Chat_Initiator():
                 encrypted_msg = base64.b64encode(encrypted_msg).decode('utf-8')
 
                 encrypted_msg = json.dumps({"encrypted_message": encrypted_msg})
+
 
                 tcp_socket.send(encrypted_msg.encode())
 
@@ -215,8 +218,9 @@ def Chat_Responder():
 
             # Receive the encrypted message
             message = client_socket.recv(1024)
-            json_data = data.decode()
-            message = json.loads(json_data)['encrypted_message']
+            json_data_encrypted = message.decode()
+            print('Received encrypted message:', json_data_encrypted)
+            message = json.loads(json_data_encrypted)['encrypted_message']
             message = base64.b64decode(message)
             message = pyDes.triple_des(incoming_key.ljust(24)).decrypt(message, padmode=2)
             
