@@ -4,13 +4,22 @@ import time
 import socket
 import threading
 
+ip_username_dict = {}
+
+
 INPUT_LOCK = threading.Lock()
 
 def locked_input(prompt):
     with INPUT_LOCK:
         return input(prompt)
 
-ip_username_dict = {}
+def get_ip_address(username, dictionary):
+    # This function is used for finding the IP address of a user in the dictionary
+    for ip_address, user_info in dictionary.items():
+        if user_info['username'] == username:
+            return ip_address
+    return None  # If username is not found in the dictionary
+
 
 def Service_Announcer(ip_address):
     #This functions requires the broadcast address as an input
@@ -119,7 +128,7 @@ def Chat_Initiator():
                 json_message = json.dumps({"unencrypted_message": message})
                 # Send the message to the end user
                 # Get the IP address from the dictionary
-                ip_address = ip_username_dict[chat_username]['ip_address']
+                ip_address = get_ip_address(chat_username, ip_username_dict)
                 # Create a TCP socket object
                 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 # Connect to the IP address and port 6001
