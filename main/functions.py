@@ -129,6 +129,7 @@ def Chat_Initiator():
                 # Send the message to the end user
                 # Get the IP address from the dictionary
                 ip_address = get_ip_address(chat_username, ip_username_dict)
+                print(ip_address)
                 # Create a TCP socket object
                 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 # Connect to the IP address and port 6001
