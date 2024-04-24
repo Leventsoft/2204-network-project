@@ -2,6 +2,8 @@ import json
 import os
 import time
 import socket
+import queue
+import threading
 
 ip_username_dict = {}
 
@@ -73,20 +75,25 @@ def check_user_status():
     # Define the dictionary as global to access the IP addresses and usernames
     global ip_username_dict
     # Get the current time
-   
-def input_function():
-    # Prompt the user to specify the action
-    action = input("Specify action (Users/Chat/History): ")
-    return action
+ 
+INPUT_LOCK = threading.Lock()
+
+def locked_input(prompt):
+    with INPUT_LOCK:
+        return input(prompt)
 
 def Chat_Initiator():
     # Define the dictionary as global to access the IP addresses and usernames
     global ip_username_dict
 
+
+
     while True:
 
-       
-        if input_function() == "Users":
+        action = locked_input("Enter an action (Users, Chat, History): ")
+
+
+        if action == "Users":
             # View online users
             current_time = time.time()
             # Iterate over the IP addresses and usernames in the dictionary
