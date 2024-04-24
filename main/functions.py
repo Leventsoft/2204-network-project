@@ -3,9 +3,10 @@ import os
 import time
 import socket
 import threading
+import pyDes
 
 ip_username_dict = {}
-
+incoming_key = 0
 
 INPUT_LOCK = threading.Lock()
 
@@ -81,7 +82,7 @@ def Peer_Discovery():
         # Display the detected user on the console
         print(username, "is online")
 
-        #print('Username:', username)
+        #print('Username:', username)wowkey
         #print([ip_username_dict])
         #print('Client IP Address:', client_address[0])
 
@@ -89,6 +90,7 @@ def Peer_Discovery():
 def Chat_Initiator():
     # Define the dictionary as global to access the IP addresses and usernames
     global ip_username_dict
+    global incoming_key
 
     while True:
 
@@ -120,6 +122,33 @@ def Chat_Initiator():
             
             if security == "S" or security == "s":
                 print("Secure chat initiated!")
+
+                # User need to enter the key
+                key = locked_input("Enter an encryption key (an integer): ")
+                # Create the JSON message with the key
+                json_message = json.dumps({"key": key})
+                # Send the message to the end user
+                # Get the IP address from the dictionary
+                ip_address = get_ip_address(chat_username, ip_username_dict)
+                # Create a TCP socket object
+                tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                # Connect to the IP address and port 6001
+                tcp_socket.connect((ip_address, 6001))
+                # Send the JSON message over the TCP connection
+                tcp_socket.send(json_message.encode())
+                # Close the TCP connection
+
+                msg = input('Input lowercase sentence:')
+                encrypted_msg = pyDes.triple_des(key.ljust(24)).encrypt(msg, padmode=2) 
+                
+                tcp_socket.sendto(encrypted_msg,ip_address)
+
+                encrypted_msg = json.dumps({"encrypted_message": encrypted_msg})
+
+                tcp_socket.send(encrypted_msg.encode())
+
+                tcp_socket.close()
+                # User need to enter the message
             
             else:
                 print("Unsecure chat initiated!")
@@ -129,7 +158,7 @@ def Chat_Initiator():
                 # Send the message to the end user
                 # Get the IP address from the dictionary
                 ip_address = get_ip_address(chat_username, ip_username_dict)
-                print(ip_address)
+                #print(ip_address)
                 # Create a TCP socket object
                 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 # Connect to the IP address and port 6001
@@ -152,7 +181,9 @@ def Chat_Initiator():
 
 def Chat_Responder():
     
-    
+    global ip_username_dict
+    global incoming_key
+
     # Create a TCP socket object
     tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # Bind the socket to a specific address and port
@@ -164,7 +195,7 @@ def Chat_Responder():
     while True:
         # Accept a connection from a client
         client_socket, client_address = tcp_socket.accept()
-        print('Received connection from:', client_address)
+        print('Received connection from:', client_address, "Username:", ip_username_dict[client_address[0]]['username'])
         
         # Receive data from the client
         data = client_socket.recv(1024)
@@ -172,6 +203,30 @@ def Chat_Responder():
         json_data = data.decode()
         # Print the received message
         print('Received message:', json_data)
+
+        # Check if the received message contains the key
+        if 'key' in json_data:
+            # Extract the key from the JSON data
+            incoming_key = json.loads(json_data)['key']
+            # Print the key
+            print('Received key:', incoming_key)
+
+            # Receive the encrypted message
+            message = client_socket.recv(1024)
+            json_data = data.decode()
+
+            message = pyDes.triple_des(incoming_key.ljust(24)).decrypt(message, padmode=2)
+
+            print('Received encrypted message:', message)
+
+
+        elif 'unencrypted_message' in json_data:
+            # Extract the unencrypted message from the JSON data
+            unencrypted_message = json.loads(json_data)['unencrypted_message']
+            # Print the unencrypted message
+            print('Received unencrypted message:', unencrypted_message)
+        else:
+            print('Invalid message received!')
         
         # Close the client socket
         client_socket.close()
