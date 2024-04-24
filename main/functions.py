@@ -29,7 +29,7 @@ def Service_Announcer(ip_address):
         # Send the message to the receiver
         broadcast_socket.sendto(message.encode(), (ip_address, port))
 
-        print(username,"is broadcasted!")
+        #print(username,"is broadcasted!")
 
         # Wait for 8 seconds before sending the next message
         time.sleep(8)
@@ -66,7 +66,7 @@ def Peer_Discovery():
         print(username, "is online")
 
         #print('Username:', username)
-        print([ip_username_dict])
+        #print([ip_username_dict])
         #print('Client IP Address:', client_address[0])
 
 def check_user_status():
