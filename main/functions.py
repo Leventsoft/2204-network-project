@@ -76,24 +76,21 @@ def check_user_status():
     global ip_username_dict
     # Get the current time
  
-def input_function(q):
-    while True:
-        action = input("Specify action (Users/Chat/History): ")
-        q.put(action)
+INPUT_LOCK = threading.Lock()
 
+def locked_input(prompt):
+    with INPUT_LOCK:
+        return input(prompt)
 
-def Chat_Initiator(action):
+def Chat_Initiator():
     # Define the dictionary as global to access the IP addresses and usernames
     global ip_username_dict
 
-    q = queue.Queue()
-    input_thread = threading.Thread(target=input_function, args=(q,))
-    input_thread.daemon = True
-    input_thread.start()
+
 
     while True:
 
-        action = q.get()
+        action = locked_input("Enter an action (Users, Chat, History): ")
 
 
         if action == "Users":
