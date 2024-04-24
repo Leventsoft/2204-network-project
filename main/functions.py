@@ -74,6 +74,10 @@ def check_user_status():
     global ip_username_dict
     # Get the current time
    
+def input_function():
+    # Prompt the user to specify the action
+    action = input("Specify action (Users/Chat/History): ")
+    return action
 
 def Chat_Initiator():
     # Define the dictionary as global to access the IP addresses and usernames
@@ -81,10 +85,8 @@ def Chat_Initiator():
 
     while True:
 
-        # Prompt the user to specify the action
-        action = input("Specify action (Users/Chat/History): ")
-
-        if action == "Users":
+       
+        if input_function() == "Users":
             # View online users
             current_time = time.time()
             # Iterate over the IP addresses and usernames in the dictionary
