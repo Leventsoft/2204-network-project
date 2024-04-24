@@ -151,4 +151,27 @@ def Chat_Initiator():
     # TCP 6001
 
 def Chat_Responder():
-    pass
+    
+    
+    # Create a TCP socket object
+    tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # Bind the socket to a specific address and port
+    tcp_socket.bind(('0.0.0.0', 6001))
+    # Listen for incoming connections
+    tcp_socket.listen(1)
+    print('Chat responder listening on port 6001...')
+    
+    while True:
+        # Accept a connection from a client
+        client_socket, client_address = tcp_socket.accept()
+        print('Received connection from:', client_address)
+        
+        # Receive data from the client
+        data = client_socket.recv(1024)
+        # Decode the received data
+        json_data = data.decode()
+        # Print the received message
+        print('Received message:', json_data)
+        
+        # Close the client socket
+        client_socket.close()
