@@ -43,7 +43,7 @@ def Peer_Discovery():
 
     print('Server listening on port 6000...')
 
-    # Define the dictionary as global to store the IP addresses and usernames
+    # Define the dictionary as global to store the IP addresses, usernames, and timestamps
     global ip_username_dict
 
     while True:
@@ -59,8 +59,15 @@ def Peer_Discovery():
         # Store the IP address and username in the dictionary
         ip_username_dict[client_address[0]] = username
 
-        print('Username:', username)
-        print('Client IP Address:', client_address[0])
+        # Update the timestamp for the sender's IP address
+        ip_username_dict[client_address[0]]['timestamp'] = time.time()
+
+        # Display the detected user on the console
+        print(username, "is online")
+
+        #print('Username:', username)
+        print([ip_username_dict])
+        #print('Client IP Address:', client_address[0])
 
 
 
