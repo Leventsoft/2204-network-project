@@ -141,7 +141,7 @@ def Chat_Initiator():
                 
                 public_key = dh_generate_public_key(int(private_key))
                 
-                json_message = json.dumps({"key": public_key})
+                json_message = json.dumps({"key": str(public_key)})
                 # Send the message to the end user
                 # Get the IP address from the dictionary
                 ip_address = get_ip_address(chat_username, ip_username_dict)
@@ -153,14 +153,15 @@ def Chat_Initiator():
                 tcp_socket.send(json_message.encode())
 
                 # Receive the public key from the end user
-                incoming_key = tcp_socket.recv(1024)
+                # tcp_socket.send(str(public_key).encode())
+                incoming_key = tcp_socket.recv(1024).decode()
 
-                wowkey = dh_compute_shared_secret(int(incoming_key), int(private_key))
-
+                if incoming_key:  # Check if incoming_key is not empty
+                    wowkey = dh_compute_shared_secret(int(incoming_key), int(private_key))
 
                 encrypted_msg = locked_input('Input lowercase sentence:')
 
-                encrypted_msg = pyDes.triple_des(wowkey.ljust(24)).encrypt(encrypted_msg, padmode=2)
+                encrypted_msg = pyDes.triple_des(str(wowkey).ljust(24)).encrypt(encrypted_msg, padmode=2)
                 
                 encrypted_msg = base64.b64encode(encrypted_msg).decode('utf-8')
 
@@ -236,9 +237,9 @@ def Chat_Responder():
             # Send the public key to the end user
             private_key = locked_input("Please enter a private key for the secure chat:")
 
-            public_key = dh_generate_public_key(private_key)
+            public_key = dh_generate_public_key(int(private_key))
 
-            client_socket.send(public_key.encode())
+            client_socket.send(str(public_key).encode())
 
             wowkey = dh_compute_shared_secret(int(incoming_key), int(private_key))
 
@@ -247,8 +248,10 @@ def Chat_Responder():
             json_data_encrypted = message.decode()
             print('Received encrypted message:', json_data_encrypted)
             message = json.loads(json_data_encrypted)['encrypted_message']
-            message = base64.b64decode(message)
-            message = pyDes.triple_des(wowkey.ljust(24)).decrypt(message, padmode=2)
+            message2 = base64.b64decode(message)
+            print('Decryption key:', wowkey)
+            print('Encrypted message:', message)
+            message = pyDes.triple_des(str(wowkey).ljust(24)).decrypt(message2, padmode=2)
             
 
 
