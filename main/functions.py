@@ -139,7 +139,7 @@ def Chat_Initiator():
                 # User need to enter the key
                 private_key =  locked_input("Enter a private key: ") # Create the JSON message with the key
                 
-                public_key = dh_generate_public_key(private_key)
+                public_key = dh_generate_public_key(int(private_key))
                 
                 json_message = json.dumps({"key": public_key})
                 # Send the message to the end user
