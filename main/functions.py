@@ -6,6 +6,8 @@ import threading
 import pyDes
 import base64
 
+
+
 ip_username_dict = {}
 incoming_key = 0
 
@@ -87,6 +89,16 @@ def Peer_Discovery():
         #print([ip_username_dict])
         #print('Client IP Address:', client_address[0])
 
+def dh_generate_public_key(private_key, g=5, p=23):
+    """ Generate private and public keys """
+    public_key = pow(g, private_key, p)     # public_key = g^private_key % p
+    return public_key
+
+def dh_compute_shared_secret(other_public_key, my_private_key, p=23):
+    """ Compute the shared secret """
+    shared_secret = pow(other_public_key, my_private_key, p)  # shared_secret = other_public_key^my_private_key % p
+    return shared_secret
+
 
 def Chat_Initiator():
     # Define the dictionary as global to access the IP addresses and usernames
@@ -125,9 +137,11 @@ def Chat_Initiator():
                 print("Secure chat initiated!")
 
                 # User need to enter the key
-                key = locked_input("Enter an encryption key (an integer): ")
-                # Create the JSON message with the key
-                json_message = json.dumps({"key": key})
+                private_key =  locked_input("Enter a private key: ") # Create the JSON message with the key
+                
+                public_key = dh_generate_public_key(private_key)
+                
+                json_message = json.dumps({"key": public_key})
                 # Send the message to the end user
                 # Get the IP address from the dictionary
                 ip_address = get_ip_address(chat_username, ip_username_dict)
@@ -137,13 +151,16 @@ def Chat_Initiator():
                 tcp_socket.connect((ip_address, 6001))
                 # Send the JSON message over the TCP connection
                 tcp_socket.send(json_message.encode())
-                # Close the TCP connection
+
+                # Receive the public key from the end user
+                incoming_key = tcp_socket.recv(1024)
+
+                wowkey = dh_compute_shared_secret(int(incoming_key), int(private_key))
 
 
+                encrypted_msg = locked_input('Input lowercase sentence:')
 
-                encrypted_msg = input('Input lowercase sentence:')
-
-                encrypted_msg = pyDes.triple_des(key.ljust(24)).encrypt(encrypted_msg, padmode=2)
+                encrypted_msg = pyDes.triple_des(wowkey.ljust(24)).encrypt(encrypted_msg, padmode=2)
                 
                 encrypted_msg = base64.b64encode(encrypted_msg).decode('utf-8')
 
@@ -153,7 +170,7 @@ def Chat_Initiator():
                 tcp_socket.send(encrypted_msg.encode())
 
                 tcp_socket.close()
-                # User need to enter the message
+                # Close the TCP connection
             
             else:
                 print("Unsecure chat initiated!")
@@ -214,7 +231,16 @@ def Chat_Responder():
             # Extract the key from the JSON data
             incoming_key = json.loads(json_data)['key']
             # Print the key
-            print('Received key:', incoming_key)
+            print('Incoming public key:', incoming_key)
+
+            # Send the public key to the end user
+            private_key = locked_input("Please enter a private key for the secure chat:")
+
+            public_key = dh_generate_public_key(private_key)
+
+            client_socket.send(public_key.encode())
+
+            wowkey = dh_compute_shared_secret(int(incoming_key), int(private_key))
 
             # Receive the encrypted message
             message = client_socket.recv(1024)
@@ -222,7 +248,7 @@ def Chat_Responder():
             print('Received encrypted message:', json_data_encrypted)
             message = json.loads(json_data_encrypted)['encrypted_message']
             message = base64.b64decode(message)
-            message = pyDes.triple_des(incoming_key.ljust(24)).decrypt(message, padmode=2)
+            message = pyDes.triple_des(wowkey.ljust(24)).decrypt(message, padmode=2)
             
 
 
