@@ -308,7 +308,10 @@ def Chat_Responder():
             time.sleep(0.1)
             
             # Check if the user is the same as the chat_username
-            if ip_username_dict[client_address[0]]['username'] != chat_username:
+            local_username = ip_username_dict[client_address[0]]['username']
+            ip_local_username = get_ip_address(local_username, ip_username_dict)
+            ip_chat_username = get_ip_address(chat_username, ip_username_dict)
+            if local_username != chat_username or ip_local_username != ip_chat_username:
                 # Press and release the 'Enter' key
                 # Need to press Enter if the user is not the same as the chat_username
                 keyboard.press(Key.enter)
