@@ -5,13 +5,29 @@ import socket
 import threading
 import pyDes
 import base64
+import sys
+from pynput.keyboard import Controller,Key
 
 
 
 ip_username_dict = {}
 incoming_key = 0
+sockets = []
+inputflag = True
+
 
 INPUT_LOCK = threading.Lock()
+
+def signal_handler(sig, frame):
+    # Close all open sockets
+
+    global sockets
+
+    for sock in sockets:
+        sock.close()
+
+    # Exit the program
+    sys.exit(0)
 
 def locked_input(prompt):
     with INPUT_LOCK:
@@ -107,106 +123,118 @@ def Chat_Initiator():
     # Define the dictionary as global to access the IP addresses and usernames
     global ip_username_dict
     global incoming_key
+    global inputflag
+
 
     while True:
+        
 
-        action = locked_input("Enter an action (Users, Chat, History): ")
+        if inputflag:
+            action = locked_input("Enter an action (Users, Chat, History): ")
 
 
-        if action == "Users":
-            # View online users
-            current_time = time.time()
-            # Iterate over the IP addresses and usernames in the dictionary
-            for ip, user_info in ip_username_dict.items():
-                # Check if the user's timestamp is within the last 15 minutes
-                if current_time - user_info['timestamp'] <= 900:
-                    # Check if the user's timestamp is within the last 10 seconds
-                    if current_time - user_info['timestamp'] <= 10:
-                        # Display the username as (Online)
-                        print(user_info['username'], "(Online)")
-                    else:
-                        # Display the username as (Away)
-                        print(user_info['username'], "(Away)")
+            if action == "Users":
+                # View online users
+                current_time = time.time()
+                # Iterate over the IP addresses and usernames in the dictionary
+                for ip, user_info in ip_username_dict.items():
+                    # Check if the user's timestamp is within the last 15 minutes
+                    if current_time - user_info['timestamp'] <= 900:
+                        # Check if the user's timestamp is within the last 10 seconds
+                        if current_time - user_info['timestamp'] <= 10:
+                            # Display the username as (Online)
+                            print(user_info['username'], "(Online)")
+                        else:
+                            # Display the username as (Away)
+                            print(user_info['username'], "(Away)")
 
-        elif action == "Chat":
-            # Initiate chat
-            print("Chat initiated!")
+            elif action == "Chat":
+                # Initiate chat
+                print("Chat initiated!")
 
-            chat_username = locked_input("Enter a username to chat with: ")
+                chat_username = locked_input("Enter a username to chat with: \n")
 
-            security = locked_input("Please specify [S]ecure or [U]nsecure chat:")
+                security = locked_input("Please specify [S]ecure or [U]nsecure chat:")
+                
+                if security == "S" or security == "s":
+                    print("Secure chat initiated!")
+
+                    # User need to enter the key
+                    private_key =  locked_input("Enter a private key: ") # Create the JSON message with the key
+                    
+                    public_key = dh_generate_public_key(int(private_key))
+                    
+                    json_message = json.dumps({"key": str(public_key)})
+                    # Send the message to the end user
+                    # Get the IP address from the dictionary
+                    ip_address = get_ip_address(chat_username, ip_username_dict)
+                    # Create a TCP socket object
+                    tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    # Connect to the IP address and port 6001
+                    tcp_socket.connect((ip_address, 6001))
+                    # Send the JSON message over the TCP connection
+                    tcp_socket.send(json_message.encode())
+
+                    # Receive the public key from the end user
+                    # tcp_socket.send(str(public_key).encode())
+                    incoming_key = tcp_socket.recv(1024).decode()
+
+                    if incoming_key:  # Check if incoming_key is not empty
+                        wowkey = dh_compute_shared_secret(int(incoming_key), int(private_key))
+
+                    encrypted_msg = locked_input('Input lowercase sentence:')
+
+                    encrypted_msg = pyDes.triple_des(str(wowkey).ljust(24)).encrypt(encrypted_msg, padmode=2)
+                    
+                    encrypted_msg = base64.b64encode(encrypted_msg).decode('utf-8')
+
+                    encrypted_msg = json.dumps({"encrypted_message": encrypted_msg})
+
+
+                    tcp_socket.send(encrypted_msg.encode())
+
+                    tcp_socket.close()
+                    # Close the TCP connection
+                
+                else:
+                    print("Unsecure chat initiated!")
+                    message = locked_input("Enter your message: ")
+                    # Create the JSON message with unencrypted message
+                    json_message = json.dumps({"unencrypted_message": message})
+                    # Send the message to the end user
+                    # Get the IP address from the dictionary
+                    ip_address = get_ip_address(chat_username, ip_username_dict)
+                    #print(ip_address)
+                    # Create a TCP socket object
+                    tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    # Connect to the IP address and port 6001
+                    tcp_socket.connect((ip_address, 6001))
+                    # Send the JSON message over the TCP connection
+                    tcp_socket.send(json_message.encode())
+                    # Close the TCP connection
+                    tcp_socket.close()
+                
+
+            elif action == "History":
+                # View chat history
+                print("Chat history:")
+                # Add your code to display chat history here
+
             
-            if security == "S" or security == "s":
+            elif action == "\n" or action.strip() == "":
+                if inputflag:
+                    continue
                 print("Secure chat initiated!")
+                continue
 
-                # User need to enter the key
-                private_key =  locked_input("Enter a private key: ") # Create the JSON message with the key
-                
-                public_key = dh_generate_public_key(int(private_key))
-                
-                json_message = json.dumps({"key": str(public_key)})
-                # Send the message to the end user
-                # Get the IP address from the dictionary
-                ip_address = get_ip_address(chat_username, ip_username_dict)
-                # Create a TCP socket object
-                tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                # Connect to the IP address and port 6001
-                tcp_socket.connect((ip_address, 6001))
-                # Send the JSON message over the TCP connection
-                tcp_socket.send(json_message.encode())
-
-                # Receive the public key from the end user
-                # tcp_socket.send(str(public_key).encode())
-                incoming_key = tcp_socket.recv(1024).decode()
-
-                if incoming_key:  # Check if incoming_key is not empty
-                    wowkey = dh_compute_shared_secret(int(incoming_key), int(private_key))
-
-                encrypted_msg = locked_input('Input lowercase sentence:')
-
-                encrypted_msg = pyDes.triple_des(str(wowkey).ljust(24)).encrypt(encrypted_msg, padmode=2)
-                
-                encrypted_msg = base64.b64encode(encrypted_msg).decode('utf-8')
-
-                encrypted_msg = json.dumps({"encrypted_message": encrypted_msg})
-
-
-                tcp_socket.send(encrypted_msg.encode())
-
-                tcp_socket.close()
-                # Close the TCP connection
-            
             else:
-                print("Unsecure chat initiated!")
-                message = locked_input("Enter your message: ")
-                # Create the JSON message with unencrypted message
-                json_message = json.dumps({"unencrypted_message": message})
-                # Send the message to the end user
-                # Get the IP address from the dictionary
-                ip_address = get_ip_address(chat_username, ip_username_dict)
-                #print(ip_address)
-                # Create a TCP socket object
-                tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                # Connect to the IP address and port 6001
-                tcp_socket.connect((ip_address, 6001))
-                # Send the JSON message over the TCP connection
-                tcp_socket.send(json_message.encode())
-                # Close the TCP connection
-                tcp_socket.close()
-               
-
-        elif action == "History":
-            # View chat history
-            print("Chat history:")
-            # Add your code to display chat history here
-
+                print("Invalid action specified!")
         else:
-            print("Invalid action specified!")
-
-    # TCP 6001
+            time.sleep(1) # Wait a bit before checking if secure chat is activated again
 
 def Chat_Responder():
     
+    global inputflag
     global ip_username_dict
     global incoming_key
 
@@ -235,10 +263,18 @@ def Chat_Responder():
             # Extract the key from the JSON data
             incoming_key = json.loads(json_data)['key']
             # Print the key
-            print('Incoming public key:', incoming_key)
 
+            print('Incoming public key:', incoming_key)
             # Send the public key to the end user
+            inputflag = False
+            keyboard = Controller()
+            time.sleep(0.01)
+            # Press and release the 'Enter' key
+            keyboard.press(Key.enter)
+            keyboard.release(Key.enter)
+
             private_key = locked_input("Please enter a private key for the secure chat:")
+            
 
             public_key = dh_generate_public_key(int(private_key))
 
@@ -259,6 +295,8 @@ def Chat_Responder():
 
 
             print('Decrypted message:', message.decode('utf-8'))
+
+            inputflag = True # Secure chat is done, so the user can initiate another secure chat
 
 
         elif 'unencrypted_message' in json_data:

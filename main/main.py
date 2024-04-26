@@ -1,10 +1,13 @@
 import threading
-from functions import Service_Announcer, Peer_Discovery, Chat_Initiator, Chat_Responder
+from functions import Service_Announcer, Peer_Discovery, Chat_Initiator, Chat_Responder, signal_handler
+import signal
 
   
 
 broadcast_ip = "192.168.194.255"
 
+# Make sure all sockets are closed when the program is terminated
+signal.signal(signal.SIGINT, signal_handler)
 
 # Create a new thread
 Announcer_Thread = threading.Thread(target=Service_Announcer, args=(broadcast_ip,))
