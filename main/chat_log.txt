@@ -13,3 +13,4 @@ SENT baris: neden olmadi 04/26/2024 10:50:39 PM
 SENT baris: simdi bu OLMAdi mi 04/26/2024 10:51:53 PM
 SENT baris: hello 04/26/2024 10:54:43 PM
 RECEIVED baris: 45 04/26/2024 10:55:33 PM
+SENT baris: üğişçö 04/26/2024 11:07:23 PM

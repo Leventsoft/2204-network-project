@@ -199,6 +199,8 @@ def Chat_Initiator():
 
                     log_message(chat_username, encrypted_msg, sent=True)
 
+                    encrypted_msg = encrypted_msg.encode('utf-8')
+
                     encrypted_msg = pyDes.triple_des(str(wowkey).ljust(24)).encrypt(encrypted_msg, padmode=2)
                     
                     encrypted_msg = base64.b64encode(encrypted_msg).decode('utf-8')
