@@ -66,7 +66,7 @@ def Service_Announcer(ip_address):
     if os.name == 'posix':
         broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-    username = locked_input("Enter a username: \n")
+    username = locked_input("\033[94;1mEnter a username: \n\033[0m")
 
     while True:
         # Create the JSON message
@@ -139,7 +139,7 @@ def Chat_Initiator():
         
 
         if inputflag:
-            action = locked_input("Enter an action ([U]sers, [C]hat, [H]istory): \n").lower()
+            action = locked_input("\033[94;1mEnter an action ([U]sers, [C]hat, [H]istory): \n\033[0m").lower()
 
 
             if action == "users" or action == "u":
@@ -161,17 +161,17 @@ def Chat_Initiator():
                 # Initiate chat
                 print("Chat initiated!")
 
-                chat_username = locked_input("Enter a username to chat with: \n")
+                chat_username = locked_input("\033[94;1mEnter a username to chat with: \n\033[0m")
                 if chat_username not in [user_info['username'] for user_info in ip_username_dict.values()]:
                     print("User not found!")
                     continue
-                security = locked_input("Please specify [S]ecure or [U]nsecure chat: ").lower()
+                security = locked_input("\033[94;1mPlease specify [S]ecure or [U]nsecure chat: \033[0m").lower()
                 
                 if security == "s" or security == "secure":
-                    print("Secure chat initiated!")
+                    print("\033[91mSecure chat initiated!\033[0m")
 
                     # User need to enter the key
-                    private_key =  locked_input("Enter a private key: ") # Create the JSON message with the key
+                    private_key =  locked_input("\033[91mEnter a private key: \033[0m") # Create the JSON message with the key
                     
                     public_key = dh_generate_public_key(int(private_key))
                     
@@ -188,12 +188,14 @@ def Chat_Initiator():
 
                     # Receive the public key from the end user
                     # tcp_socket.send(str(public_key).encode())
+                    print("\033[3mWaiting for the recipient's public key.\033[0m")
+
                     incoming_key = tcp_socket.recv(1024).decode()
 
                     if incoming_key:  # Check if incoming_key is not empty
                         wowkey = dh_compute_shared_secret(int(incoming_key), int(private_key))
 
-                    encrypted_msg = locked_input('Input lowercase sentence:')
+                    encrypted_msg = locked_input('Input lowercase sentence: ')
 
                     log_message(chat_username, encrypted_msg, sent=True)
 
@@ -246,7 +248,7 @@ def Chat_Initiator():
             elif action == "\n" or action.strip() == "":
                 if inputflag:
                     continue
-                print("Secure chat initiated!")
+                print("\033[91mSecure chat initiated!\033[0m")
                 continue
 
             else:
@@ -290,13 +292,14 @@ def Chat_Responder():
             # Send the public key to the end user
             inputflag = False
             keyboard = Controller()
-            time.sleep(0.01)
+            time.sleep(0.1)
             # Press and release the 'Enter' key
             keyboard.press(Key.enter)
+            time.sleep(0.001)
             keyboard.release(Key.enter)
 
-            private_key = locked_input("Please enter a private key for the secure chat: ")
-            
+            private_key = locked_input("\033[91mPlease enter a private key for the secure chat: \033[0m")
+            print("\033[3mWaiting for the message...\033[0m")
 
             public_key = dh_generate_public_key(int(private_key))
 
@@ -316,7 +319,7 @@ def Chat_Responder():
             
             log_message(ip_username_dict[client_address[0]]['username'], message.decode('utf-8'), sent=False)
 
-            print('Decrypted message from', ip_username_dict[client_address[0]]['username'], ':', message.decode('utf-8'))
+            print('\033[1mDecrypted message from', ip_username_dict[client_address[0]]['username'], ':', message.decode('utf-8'), '\033[0m')
 
             inputflag = True # Secure chat is done, so the user can initiate another secure chat
 
