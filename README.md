@@ -1,12 +1,16 @@
 # 2204-network-project
 
-##The broadcast ip must be specified on the 5th line of main.py
+**The broadcast ip must be specified on the 5th line of main.py
 
 Required External Libraries: pynput, base64, pydes
 So you need to run
 ```shell
 pip install pynput base64 pydes
 ```
+
+!! COMMENTLER GÖZDEN GEÇİRİLECEK
+
+
 ### Faced Challenges:
 
 Locked Input meselesi
