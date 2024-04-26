@@ -23,6 +23,7 @@ Chat_Initiator_Thread.start()
 Chat_Responder_Thread.start()
 
 # Wait for the threads to finish
+
 Announcer_Thread.join()
 Discovery_Thread.join()
 Chat_Initiator_Thread.join()

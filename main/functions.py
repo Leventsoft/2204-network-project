@@ -33,9 +33,11 @@ def signal_handler():
 
     for sock in sockets:
         sock.close()
-
+    
     # Exit the program
     sys.exit(0)
+
+    
 
 def locked_input(prompt):
     with INPUT_LOCK:
@@ -105,8 +107,7 @@ def Peer_Discovery():
             # Store the IP address and username in the dictionary
             ip_username_dict[client_address[0]] = {'username': username}
             # Display the detected user on the console
-            print()
-            print(username, "is online")
+            print(username +'\033[92m' +  " is online" + '\033[0m')
             
 
         # Update the timestamp for the sender's IP address
@@ -138,7 +139,7 @@ def Chat_Initiator():
         
 
         if inputflag:
-            action = locked_input("Enter an action ([U]sers, [C]hat, [H]istory, [E]xit): \n").lower()
+            action = locked_input("Enter an action ([U]sers, [C]hat, [H]istory): \n").lower()
 
 
             if action == "users" or action == "u":
@@ -150,19 +151,21 @@ def Chat_Initiator():
                     if current_time - user_info['timestamp'] <= 900:
                         # Check if the user's timestamp is within the last 10 seconds
                         if current_time - user_info['timestamp'] <= 10:
-                            # Display the username as (Online)
-                            print(user_info['username'], "(Online)")
+                            # Display the username as (Online) in green
+                            print('\033[1m' + user_info['username'] + '\033[0m' + '\033[92m' + ' (Online)' + '\033[0m')
                         else:
-                            # Display the username as (Away)
-                            print(user_info['username'], "(Away)")
+                            # Display the username as (Away) in yellow
+                            print('\033[1m' + user_info['username'] + '\033[0m' +'\033[93m' + ' (Away)' + '\033[0m')
 
             elif action == "chat" or action == "c":
                 # Initiate chat
                 print("Chat initiated!")
 
                 chat_username = locked_input("Enter a username to chat with: \n")
-
-                security = locked_input("Please specify [S]ecure or [U]nsecure chat:").lower()
+                if chat_username not in [user_info['username'] for user_info in ip_username_dict.values()]:
+                    print("User not found!")
+                    continue
+                security = locked_input("Please specify [S]ecure or [U]nsecure chat: ").lower()
                 
                 if security == "s" or security == "secure":
                     print("Secure chat initiated!")
@@ -228,15 +231,18 @@ def Chat_Initiator():
 
             elif action == "history" or action == "h":
                 # View chat history
-                print("Chat history:")
+                print("Chat history: \n")
+                
                 # Add your code to display chat history here
 
-            elif action == "exit" or action == "e":
-                # Exit the program
-                print("Exiting...")
-                signal_handler()
+                with open('chat_log.txt', 'r') as file:
+                    lines = file.readlines()
+                    last_10_lines = lines[-10:]
+                    reversed_lines = reversed(last_10_lines)
+                    for line in reversed_lines:
+                        print(line.strip())
 
-            
+                
             elif action == "\n" or action.strip() == "":
                 if inputflag:
                     continue
@@ -289,7 +295,7 @@ def Chat_Responder():
             keyboard.press(Key.enter)
             keyboard.release(Key.enter)
 
-            private_key = locked_input("Please enter a private key for the secure chat:")
+            private_key = locked_input("Please enter a private key for the secure chat: ")
             
 
             public_key = dh_generate_public_key(int(private_key))
@@ -310,7 +316,7 @@ def Chat_Responder():
             
             log_message(ip_username_dict[client_address[0]]['username'], message.decode('utf-8'), sent=False)
 
-            print('Decrypted message:', message.decode('utf-8'))
+            print('Decrypted message from', ip_username_dict[client_address[0]]['username'], ':', message.decode('utf-8'))
 
             inputflag = True # Secure chat is done, so the user can initiate another secure chat
 
