@@ -82,8 +82,11 @@ def Peer_Discovery():
         # Update the timestamp for the sender's IP address
         ip_username_dict[client_address[0]]['timestamp'] = time.time()
 
-        # Display the detected user on the console
-        print(username, "is online")
+        # Check if the user is already in the dictionary or if the user's timestamp is more than 15 minutes ago
+        if client_address[0] not in ip_username_dict or time.time() - ip_username_dict[client_address[0]]['timestamp'] > 900:
+            # Store the IP address and username in the dictionary
+            # Display the detected user on the console
+            print(username, "is online")
 
         #print('Username:', username)wowkey
         #print([ip_username_dict])
