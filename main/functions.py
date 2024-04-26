@@ -92,17 +92,17 @@ def Peer_Discovery():
         # Extract the username from the JSON data
         username = json_data['username']
 
-        # Store the IP address and username in the dictionary
-        ip_username_dict[client_address[0]] = {'username': username}
-
-        # Update the timestamp for the sender's IP address
-        ip_username_dict[client_address[0]]['timestamp'] = time.time()
-
         # Check if the user is already in the dictionary or if the user's timestamp is more than 15 minutes ago
         if client_address[0] not in ip_username_dict or time.time() - ip_username_dict[client_address[0]]['timestamp'] > 900:
             # Store the IP address and username in the dictionary
+            ip_username_dict[client_address[0]] = {'username': username}
             # Display the detected user on the console
+            print()
             print(username, "is online")
+            
+
+        # Update the timestamp for the sender's IP address
+        ip_username_dict[client_address[0]]['timestamp'] = time.time()
 
         #print('Username:', username)wowkey
         #print([ip_username_dict])
@@ -130,10 +130,10 @@ def Chat_Initiator():
         
 
         if inputflag:
-            action = locked_input("Enter an action (Users, Chat, History): ")
+            action = locked_input("Enter an action ([U]sers, [C]hat, [H]istory, [E]xit): \n").lower()
 
 
-            if action == "Users":
+            if action == "users" or action == "u":
                 # View online users
                 current_time = time.time()
                 # Iterate over the IP addresses and usernames in the dictionary
@@ -148,15 +148,15 @@ def Chat_Initiator():
                             # Display the username as (Away)
                             print(user_info['username'], "(Away)")
 
-            elif action == "Chat":
+            elif action == "chat" or action == "c":
                 # Initiate chat
                 print("Chat initiated!")
 
                 chat_username = locked_input("Enter a username to chat with: \n")
 
-                security = locked_input("Please specify [S]ecure or [U]nsecure chat:")
+                security = locked_input("Please specify [S]ecure or [U]nsecure chat:").lower()
                 
-                if security == "S" or security == "s":
+                if security == "s" or security == "secure":
                     print("Secure chat initiated!")
 
                     # User need to enter the key
@@ -215,10 +215,15 @@ def Chat_Initiator():
                     tcp_socket.close()
                 
 
-            elif action == "History":
+            elif action == "history" or action == "h":
                 # View chat history
                 print("Chat history:")
                 # Add your code to display chat history here
+
+            elif action == "exit" or action == "e":
+                # Exit the program
+                print("Exiting...")
+                signal_handler()
 
             
             elif action == "\n" or action.strip() == "":

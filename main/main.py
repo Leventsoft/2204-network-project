@@ -14,7 +14,9 @@ Announcer_Thread = threading.Thread(target=Service_Announcer, args=(broadcast_ip
 Discovery_Thread = threading.Thread(target=Peer_Discovery)
 Chat_Initiator_Thread = threading.Thread(target=Chat_Initiator)
 Chat_Responder_Thread = threading.Thread(target=Chat_Responder)
+
 # Start the thread
+
 Announcer_Thread.start()
 Discovery_Thread.start()
 Chat_Initiator_Thread.start()
