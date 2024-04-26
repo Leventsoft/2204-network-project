@@ -1,12 +1,16 @@
 # 2204-network-project
 
-The broadcast ip must be specified on the 5th line of main.py
+##The broadcast ip must be specified on the 5th line of main.py
+
+Required External Libraries: pynput, base64, pydes
 
 ### Faced Challenges:
 
 Locked Input meselesi
 
 return ip address because ip addreses are keys
+
+two way key exchange was a real challenge
 
 ### Known Limitations:
 

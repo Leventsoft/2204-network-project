@@ -1,6 +1,7 @@
 import threading
 from functions import Service_Announcer, Peer_Discovery, Chat_Initiator, Chat_Responder, signal_handler
 import signal
+import time
 
   
 
@@ -18,11 +19,15 @@ Chat_Responder_Thread = threading.Thread(target=Chat_Responder)
 # Start the thread
 
 Announcer_Thread.start()
+time.sleep(0.001)
 Discovery_Thread.start()
+time.sleep(0.001)
 Chat_Initiator_Thread.start()
+time.sleep(0.001)
 Chat_Responder_Thread.start()
 
 # Wait for the threads to finish
+
 
 Announcer_Thread.join()
 Discovery_Thread.join()

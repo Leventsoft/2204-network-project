@@ -139,7 +139,7 @@ def Chat_Initiator():
         
 
         if inputflag:
-            action = locked_input("Enter an action ([U]sers, [C]hat, [H]istory): \n").lower()
+            action = locked_input("\n Enter an action ([U]sers, [C]hat, [H]istory): \n").lower()
 
 
             if action == "users" or action == "u":
