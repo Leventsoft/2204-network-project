@@ -14,3 +14,9 @@ SENT baris: simdi bu OLMAdi mi 04/26/2024 10:51:53 PM
 SENT baris: hello 04/26/2024 10:54:43 PM
 RECEIVED baris: 45 04/26/2024 10:55:33 PM
 SENT baris: üğişçö 04/26/2024 11:07:23 PM
+RECEIVED baris: şişpşi 04/26/2024 11:08:58 PM
+SENT baris: hello barış 04/26/2024 11:12:29 PM
+SENT baris: hello baris 04/26/2024 11:13:04 PM
+SENT kerem: benden kereme selamlar 04/26/2024 11:17:48 PM
+RECEIVED kerem: hello levent 04/26/2024 11:17:50 PM
+RECEIVED baris: sifreli mesajımız 04/26/2024 11:18:37 PM
