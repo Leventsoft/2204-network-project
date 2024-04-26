@@ -66,6 +66,7 @@ def Service_Announcer(ip_address):
     if os.name == 'posix':
         broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
+    time.sleep(0.03)
     username = locked_input("\033[94;1mEnter a username: \n\033[0m")
 
     while True:
@@ -120,6 +121,7 @@ def Peer_Discovery():
 def dh_generate_public_key(private_key, g=5, p=23):
     """ Generate private and public keys """
     public_key = pow(g, private_key, p)     # public_key = g^private_key % p
+    time.sleep(0.1)
     return public_key
 
 def dh_compute_shared_secret(other_public_key, my_private_key, p=23):
@@ -133,12 +135,14 @@ def Chat_Initiator():
     global ip_username_dict
     global incoming_key
     global inputflag
+    global chat_username
 
 
     while True:
         
 
         if inputflag:
+            time.sleep(0.1) # Wait a bit before checking if secure chat is activated again
             action = locked_input("\033[94;1mEnter an action \033[0m([U]sers, [C]hat, [H]istory): \n").lower()
 
 
@@ -188,14 +192,15 @@ def Chat_Initiator():
 
                     # Receive the public key from the end user
                     # tcp_socket.send(str(public_key).encode())
-                    print("\033[3mWaiting for the recipient's public key.\033[0m")
+                    print("\033[3mWaiting for the recipient's public key. \033[0m")
 
                     incoming_key = tcp_socket.recv(1024).decode()
+                    print('Incoming public key:', incoming_key)
 
                     if incoming_key:  # Check if incoming_key is not empty
                         wowkey = dh_compute_shared_secret(int(incoming_key), int(private_key))
 
-                    encrypted_msg = locked_input('Input lowercase sentence: ')
+                    encrypted_msg = locked_input('Enter a message to encrypt: ')
 
                     log_message(chat_username, encrypted_msg, sent=True)
 
@@ -282,7 +287,13 @@ def Chat_Responder():
         # Decode the received data
         json_data = data.decode()
         # Print the received message
-        print('Received message:', json_data)
+        # print('Received message:', json_data)
+        # Decode the received message
+        decoded_message = json.loads(json_data)
+        # Print the decoded message
+        print('Received message:', decoded_message)
+
+        print('User:', '\033[1m' + ip_username_dict[client_address[0]]['username'] + '\033[0m', 'is chatting with:', '\033[1m' + chat_username + '\033[0m')
 
         # Check if the received message contains the key
         if 'key' in json_data:
@@ -295,10 +306,14 @@ def Chat_Responder():
             inputflag = False
             keyboard = Controller()
             time.sleep(0.1)
-            # Press and release the 'Enter' key
-            keyboard.press(Key.enter)
-            time.sleep(0.001)
-            keyboard.release(Key.enter)
+            
+            # Check if the user is the same as the chat_username
+            if ip_username_dict[client_address[0]]['username'] != chat_username:
+                # Press and release the 'Enter' key
+                # Need to press Enter if the user is not the same as the chat_username
+                keyboard.press(Key.enter)
+                time.sleep(0.001)
+                keyboard.release(Key.enter)
 
             private_key = locked_input("\033[91mPlease enter a private key for the secure chat: \033[0m")
             print("\033[3mWaiting for the message...\033[0m")
@@ -317,8 +332,10 @@ def Chat_Responder():
             message2 = base64.b64decode(message)
             print('Decryption key:', wowkey)
             print('Encrypted message:', message)
+            time.sleep(0.01)
             message = pyDes.triple_des(str(wowkey).ljust(24)).decrypt(message2, padmode=2)
-            
+            time.sleep(0.1)
+
             log_message(ip_username_dict[client_address[0]]['username'], message.decode('utf-8'), sent=False)
 
             print('\033[1mDecrypted message from', ip_username_dict[client_address[0]]['username'], ':', message.decode('utf-8'), '\033[0m')
@@ -331,7 +348,7 @@ def Chat_Responder():
             unencrypted_message = json.loads(json_data)['unencrypted_message']
             # Print the unencrypted message
             log_message(ip_username_dict[client_address[0]]['username'], unencrypted_message, sent=False)
-            print('Received unencrypted message:', unencrypted_message)
+            print('\033[1mReceived unencrypted message from', ip_username_dict[client_address[0]]['username'], ':', unencrypted_message, '\033[0m')
         else:
             print('Invalid message received!')
         
