@@ -7,8 +7,16 @@ import pyDes
 import base64
 import sys
 from pynput.keyboard import Controller,Key
+import logging
 
+# Set up logging
+logging.basicConfig(filename='chat_log.txt', level=logging.INFO, 
+                    format='%(message)s %(asctime)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
+def log_message(username, message, sent=True):
+    # Log the message with a 'SENT' or 'RECEIVED' stamp, a username, and a timestamp
+    stamp = 'SENT' if sent else 'RECEIVED'
+    logging.info(f'{stamp} {username}: {message}')
 
 ip_username_dict = {}
 incoming_key = 0
@@ -18,7 +26,7 @@ inputflag = True
 
 INPUT_LOCK = threading.Lock()
 
-def signal_handler(sig, frame):
+def signal_handler():
     # Close all open sockets
 
     global sockets
@@ -56,7 +64,7 @@ def Service_Announcer(ip_address):
     if os.name == 'posix':
         broadcast_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-    username = locked_input("Enter a username: ")
+    username = locked_input("Enter a username: \n")
 
     while True:
         # Create the JSON message
@@ -184,6 +192,8 @@ def Chat_Initiator():
 
                     encrypted_msg = locked_input('Input lowercase sentence:')
 
+                    log_message(chat_username, encrypted_msg, sent=True)
+
                     encrypted_msg = pyDes.triple_des(str(wowkey).ljust(24)).encrypt(encrypted_msg, padmode=2)
                     
                     encrypted_msg = base64.b64encode(encrypted_msg).decode('utf-8')
@@ -200,6 +210,7 @@ def Chat_Initiator():
                     print("Unsecure chat initiated!")
                     message = locked_input("Enter your message: ")
                     # Create the JSON message with unencrypted message
+                    log_message(chat_username, message, sent=True)
                     json_message = json.dumps({"unencrypted_message": message})
                     # Send the message to the end user
                     # Get the IP address from the dictionary
@@ -297,7 +308,7 @@ def Chat_Responder():
             print('Encrypted message:', message)
             message = pyDes.triple_des(str(wowkey).ljust(24)).decrypt(message2, padmode=2)
             
-
+            log_message(ip_username_dict[client_address[0]]['username'], message.decode('utf-8'), sent=False)
 
             print('Decrypted message:', message.decode('utf-8'))
 
@@ -308,6 +319,7 @@ def Chat_Responder():
             # Extract the unencrypted message from the JSON data
             unencrypted_message = json.loads(json_data)['unencrypted_message']
             # Print the unencrypted message
+            log_message(ip_username_dict[client_address[0]]['username'], unencrypted_message, sent=False)
             print('Received unencrypted message:', unencrypted_message)
         else:
             print('Invalid message received!')
