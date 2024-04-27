@@ -8,6 +8,7 @@ import base64
 import sys
 from pynput.keyboard import Controller,Key
 import logging
+import signal
 
 # Set up logging
 logging.basicConfig(filename='chat_log.txt', level=logging.INFO, 
@@ -23,7 +24,6 @@ incoming_key = 0
 sockets = []
 inputflag = True
 local_ip = ''
-local_username = ''
 
 
 INPUT_LOCK = threading.Lock()
@@ -150,7 +150,7 @@ def Chat_Initiator():
 
         if inputflag:
             time.sleep(0.1) # Wait a bit before checking if secure chat is activated again
-            action = locked_input("\033[94;1mEnter an action \033[0m([U]sers, [C]hat, [H]istory): \n").lower()
+            action = locked_input("\033[94;1mEnter an action \033[0m([U]sers, [C]hat, [H]istory, [E]xit): \n").lower()
 
 
             if action == "users" or action == "u":
@@ -263,7 +263,11 @@ def Chat_Initiator():
                     reversed_lines = reversed(last_10_lines)
                     for line in reversed_lines:
                         print(line.strip())
-
+						
+            elif action == "exit" or action == "e":
+                print("Exiting the program...")
+                time.sleep(0.05)
+                os.kill(os.getpid(), signal.SIGTERM)
                 
             elif action == "\n" or action.strip() == "":
                 if inputflag:
