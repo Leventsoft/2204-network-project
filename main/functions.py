@@ -22,6 +22,7 @@ ip_username_dict = {}
 incoming_key = 0
 sockets = []
 inputflag = True
+local_ip = ''
 
 
 INPUT_LOCK = threading.Lock()
@@ -53,6 +54,7 @@ def get_ip_address(username, dictionary):
 
 def Service_Announcer(ip_address):
     #This functions requires the broadcast address as an input
+    global local_username
  
     # Set the IP address and port of the receiver
     port = 6000
@@ -68,6 +70,7 @@ def Service_Announcer(ip_address):
 
     time.sleep(0.03)
     username = locked_input("\033[94;1mEnter a username: \n\033[0m")
+    local_username = username
 
     while True:
         # Create the JSON message
@@ -92,6 +95,7 @@ def Peer_Discovery():
 
     # Define the dictionary as global to store the IP addresses, usernames, and timestamps
     global ip_username_dict
+    global local_ip
 
     while True:
         # Receive data from the client
@@ -109,7 +113,9 @@ def Peer_Discovery():
             ip_username_dict[client_address[0]] = {'username': username}
             # Display the detected user on the console
             print(username +'\033[92m' +  " is online" + '\033[0m')
-            
+            if not local_ip:
+                local_ip = client_address[0]
+                print('Local IP:', local_ip)
 
         # Update the timestamp for the sender's IP address
         ip_username_dict[client_address[0]]['timestamp'] = time.time()
@@ -175,7 +181,11 @@ def Chat_Initiator():
                     print("\033[91mSecure chat initiated!\033[0m")
 
                     # User need to enter the key
-                    private_key =  locked_input("\033[91mEnter a private key: \033[0m") # Create the JSON message with the key
+                    private_key = ''
+                    while not private_key:
+                        private_key = locked_input("\033[91mEnter a private key: \033[0m") # Create the JSON message with the key
+                        if not private_key:
+                            print("Private key cannot be empty. Please try again.")
                     
                     public_key = dh_generate_public_key(int(private_key))
                     
@@ -203,6 +213,7 @@ def Chat_Initiator():
                     encrypted_msg = locked_input('Enter a message to encrypt: ')
 
                     log_message(chat_username, encrypted_msg, sent=True)
+                    print('\033[1m[SENT]\033[0m' + f' {chat_username}: {encrypted_msg}')
 
                     encrypted_msg = encrypted_msg.encode('utf-8')
 
@@ -223,6 +234,7 @@ def Chat_Initiator():
                     message = locked_input("Enter your message: ")
                     # Create the JSON message with unencrypted message
                     log_message(chat_username, message, sent=True)
+                    print('\033[1m[SENT]\033[0m' + f' {chat_username}: {message}')
                     json_message = json.dumps({"unencrypted_message": message})
                     # Send the message to the end user
                     # Get the IP address from the dictionary
@@ -291,9 +303,9 @@ def Chat_Responder():
         # Decode the received message
         decoded_message = json.loads(json_data)
         # Print the decoded message
-        print('Received message:', decoded_message)
-
-        print('User:', '\033[1m' + ip_username_dict[client_address[0]]['username'] + '\033[0m', 'is chatting with:', '\033[1m' + chat_username + '\033[0m')
+        print('\033[1m[RECEIVED]\033[0m', ip_username_dict[client_address[0]]['username'], ':', decoded_message)
+        # Debug line to see the IP address of the client
+        # print(client_address[0])
 
         # Check if the received message contains the key
         if 'key' in json_data:
@@ -307,18 +319,23 @@ def Chat_Responder():
             keyboard = Controller()
             time.sleep(0.1)
             
-            # Check if the user is the same as the chat_username
-            local_username = ip_username_dict[client_address[0]]['username']
-            ip_local_username = get_ip_address(local_username, ip_username_dict)
-            ip_chat_username = get_ip_address(chat_username, ip_username_dict)
-            if local_username != chat_username or ip_local_username != ip_chat_username:
+            # Check if the user is chatting with the same user
+            # Debug line to see the local IP address and the client's IP address
+            # print('Local IP:', local_ip, 'Client IP:', client_address[0], 'Local username:', local_username, 'Client username:', ip_username_dict[client_address[0]]['username'])
+            if local_username != ip_username_dict[client_address[0]]['username'] or local_ip != client_address[0]:
                 # Press and release the 'Enter' key
-                # Need to press Enter if the user is not the same as the chat_username
+                # Need to press Enter if the user is not chatting the same user
                 keyboard.press(Key.enter)
-                time.sleep(0.001)
+                time.sleep(0.01)
                 keyboard.release(Key.enter)
-
-            private_key = locked_input("\033[91mPlease enter a private key for the secure chat: \033[0m")
+            
+            print("\033[3mYou need to enter a private key...\033[0m")
+            private_key = ''
+            while not private_key:
+                private_key = locked_input("\033[91mPlease enter a private key for the secure chat: \033[0m")
+                if not private_key:
+                    print("Private key cannot be empty. Please try again.")
+            
             print("\033[3mWaiting for the message...\033[0m")
 
             public_key = dh_generate_public_key(int(private_key))

@@ -20,3 +20,13 @@ SENT baris: hello baris 04/26/2024 11:13:04 PM
 SENT kerem: benden kereme selamlar 04/26/2024 11:17:48 PM
 RECEIVED kerem: hello levent 04/26/2024 11:17:50 PM
 RECEIVED baris: sifreli mesajÄ±mÄ±z 04/26/2024 11:18:37 PM
+SENT desktop: test 04/27/2024 11:35:17 AM
+RECEIVED desktop: test 04/27/2024 11:37:33 AM
+SENT desktop: tttt 04/27/2024 11:45:25 AM
+RECEIVED desktop: hh 04/27/2024 11:46:32 AM
+SENT desktop: tt 04/27/2024 11:52:56 AM
+SENT desktop: tt 04/27/2024 11:59:01 AM
+SENT desktop: 5677 04/27/2024 12:01:44 PM
+SENT laptop: test ayný 04/27/2024 02:27:07 PM
+RECEIVED laptop: test ayný 04/27/2024 02:27:07 PM
+SENT desktop: test ayný 04/27/2024 02:27:28 PM

@@ -5,7 +5,9 @@ import time
 
   
 
+
 broadcast_ip = "192.168.194.255"
+# broadcast_ip = "10.0.0.255"
 
 # Make sure all sockets are closed when the program is terminated
 signal.signal(signal.SIGINT, signal_handler)
