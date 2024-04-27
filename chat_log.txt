@@ -1,4 +1,0 @@
-SENT levent: helloofödsmfsfnjsıd 04/27/2024 09:31:58 PM
-RECEIVED levent: helloofödsmfsfnjsıd 04/27/2024 09:31:58 PM
-SENT baris: kolay gelsin 04/27/2024 10:21:55 PM
-RECEIVED baris: evet geldi 04/27/2024 10:22:53 PM
