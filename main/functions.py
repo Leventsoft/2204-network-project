@@ -113,7 +113,7 @@ def Peer_Discovery():
             ip_username_dict[client_address[0]] = {'username': username}
             # Display the detected user on the console
             print(username +'\033[92m' +  " is online" + '\033[0m')
-            if not local_ip:
+            if not local_ip and local_username == ip_username_dict[client_address[0]]['username']:
                 local_ip = client_address[0]
                 print('Local IP:', local_ip)
 
