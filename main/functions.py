@@ -5,7 +5,6 @@ import socket
 import threading
 import pyDes
 import base64
-import sys
 from pynput.keyboard import Controller,Key
 import logging
 import signal
