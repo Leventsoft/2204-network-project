@@ -1,1 +1,0 @@
-message = base64.b64decode(message)

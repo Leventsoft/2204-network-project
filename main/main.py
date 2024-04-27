@@ -4,8 +4,6 @@ import signal
 import time
 
   
-
-
 broadcast_ip = "192.168.194.255"
 # broadcast_ip = "10.0.0.255"
 

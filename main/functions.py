@@ -37,7 +37,7 @@ def signal_handler():
         sock.close()
     
     # Exit the program
-    sys.exit(0)
+    os.kill(os.getpid(), signal.SIGTERM)
 
     
 
@@ -267,7 +267,7 @@ def Chat_Initiator():
             elif action == "exit" or action == "e":
                 print("Exiting the program...")
                 time.sleep(0.05)
-                os.kill(os.getpid(), signal.SIGTERM)
+                signal_handler()
                 
             elif action == "\n" or action.strip() == "":
                 if inputflag:
