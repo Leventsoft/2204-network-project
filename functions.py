@@ -23,7 +23,7 @@ incoming_key = 0
 sockets = []
 inputflag = True
 local_ip = ''
-
+local_username = ''
 
 INPUT_LOCK = threading.Lock()
 
